@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Martin Benavides Silva | Tokyo Drift Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0a0a0f;
+            --text-color: #ffffff;
+            --accent-pink: #ff0055;
+            --accent-green: #39ff14;
+            --accent-cyan: #00f0ff;
+            --card-bg: rgba(18, 18, 26, 0.95);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(255, 0, 85, 0.15), transparent 40%),
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px 10px;
+        }
+
+        .contenedor-titulo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .titulo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-style: italic;
+            letter-spacing: 3px;
+            color: var(--text-color);
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px var(--accent-pink),
+                0 0 20px var(--accent-pink),
+                0 0 40px var(--accent-pink);
+        }
+
+        .conten-principal {
+            display: flex;
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 2px solid var(--accent-pink);
+            box-shadow: 0 0 25px rgba(255, 0, 85, 0.3);
+            padding: 20px;
+        }
+
+        .conten-imagen {
+            flex: 0 0 300px;
+            height: 380px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--accent-cyan);
+            border-radius: 4px;
+            padding: 5px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            background: #000;
+        }
+
+        .imagen-perfil {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .conten-parrafo {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .p-nombre {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-style: italic;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
+            border-bottom: 2px solid var(--accent-cyan);
+            padding-bottom: 5px;
+        }
+
+        .parrafo {
+            font-size: 1.15rem;
+            line-height: 1.5;
+            color: #d1d5db;
+            letter-spacing: 0.5px;
+        }
+
+        .botones_1 {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .boton_1 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            padding: 12px 24px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--accent-green);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            transform: skewX(-12deg);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .boton_1 span {
+            display: inline-block;
+            transform: skewX(12deg);
+        }
+
+        .boton_1:hover {
+            background: var(--accent-green);
+            color: #000;
+            box-shadow: 0 0 20px var(--accent-green);
+            transform: skewX(-12deg) scale(1.05);
+        }
+
+        .horario {
+            margin-top: 20px;
+            border-top: 2px dashed var(--accent-pink);
+            padding-top: 15px;
+        }
+
+        .h-titulo {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-pink);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .tabla-contenedor {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        .tabla {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.5);
+            font-size: 0.95rem;
+        }
+
+        .tabla th, .tabla td {
+            border: 1px solid rgba(255, 0, 85, 0.3);
+            padding: 10px 6px;
+            text-align: center;
+        }
+
+        .tabla th {
+            font-family: 'Orbitron', sans-serif;
+            background-color: rgba(255, 0, 85, 0.2);
+            color: var(--accent-pink);
+            font-size: 0.85rem;
+        }
+
+        /* MODO NEON / HACKER */
+        .modo-hacker th {
+            background-color: var(--accent-cyan) !important;
+            color: #000 !important;
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        .modo-hacker td {
+            background-color: #111 !important;
+            color: var(--accent-green) !important;
+            border-color: var(--accent-green) !important;
+            text-shadow: 0 0 5px var(--accent-green);
+        }
+
+        /* ESTILO SECCIÓN REGISTRO */
+        .registro {
+            display: none;
+            max-width: 500px;
+            margin: 40px auto;
+            background: var(--card-bg);
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.3);
+            padding: 30px;
+            border-radius: 4px;
+        }
+
+        .registro label {
+            display: block;
+            margin-top: 15px;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+        }
+
+        .registro input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid var(--accent-green);
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            box-shadow: inset 0 0 5px rgba(57, 255, 20, 0.2);
+        }
+
+        .registro input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        .btn-submit {
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .btn-volver {
+            margin-top: 15px;
+            width: 100%;
+            border-color: var(--accent-pink) !important;
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.4) !important;
+        }
+
+        .btn-volver:hover {
+            background: var(--accent-pink) !important;
+            color: #fff !important;
+            box-shadow: 0 0 20px var(--accent-pink) !important;
+        }
+
+        /* FICHA TÉCNICA ESTILO PILOTO F1 */
+        .ficha-tecnica {
+            max-width: 1100px;
+            margin: 20px auto 0;
+            background: var(--card-bg);
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.3);
+            padding: 20px;
+        }
+
+        .ficha-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 2px dashed var(--accent-pink);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .ficha-numero {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 2rem;
+            color: var(--accent-pink);
+            text-shadow: 0 0 15px rgba(255, 0, 85, 0.6);
+            border: 2px solid var(--accent-pink);
+            padding: 4px 15px;
+            transform: skewX(-10deg);
+        }
+
+        .ficha-titulo {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-cyan);
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .ficha-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .ficha-item {
+            background: rgba(0, 0, 0, 0.5);
+            border-left: 3px solid var(--accent-green);
+            padding: 10px 14px;
+        }
+
+        .ficha-label {
+            display: block;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            color: var(--accent-green);
+            letter-spacing: 1.5px;
+            margin-bottom: 4px;
+        }
+
+        .ficha-valor {
+            display: block;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .conten-principal {
+                flex-direction: column;
+            }
+            .conten-imagen {
+                width: 100%;
+                flex: 1;
+            }
+            .titulo {
+                font-size: 1.8rem;
+            }
+            .p-nombre {
+                font-size: 1.5rem;
+            }
+            .botones_1 {
+                justify-content: center;
+            }
+            .boton_1 {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="pagina-inicio">
+        <header>
+            <div class="contenedor-titulo">
+                <h1 class="titulo">Martin Benavides Silva</h1>
+            </div>
+        </header>
+
+        <main class="conten-principal">
+            <div class="conten-imagen">
+                <img src="foto.png" alt="Foto de Martin" class="imagen-perfil">
+            </div>
+
+            <div class="conten-parrafo">
+                <h2 class="p-nombre">MS PERFORMANCE // GARAGE</h2>
+                <p class="parrafo">Martin es un estudiante colombiano apasionado por el automovilismo y el diseño de autos, especialmente por los deportivos y hypercars de estilo agresivo inspirados en el mundo JDM y las pistas. Tiene una gran imaginación para crear proyectos propios, como sus modelos de la marca MS, combinando potencia, diseño y personalidad en cada idea. Además de interesarse por motores, drifting y modelos 3D, también disfruta crear historias, escenas cinematográficas y cómics con un estilo muy visual y creativo.</p>
+            
+                <div class="botones_1">
+                    <button class="boton_1" id="btn-toggle"><span>Ver/Ocultar Horario</span></button>
+                    <button class="boton_1" id="btn-color"><span>Modo Neon</span></button>
+                    <button class="boton_1" id="btn-registro"><span>Registrarse</span></button>
+                    <a href="registro_nuevo.html" target="_blank" class="boton_1"><span>Crear Cuenta</span></a>
+                </div>
+
+                <section class="horario" id="horario">
+                    <h3 class="h-titulo">Horario de Pista</h3>
+                    <div class="tabla-contenedor">
+                        <table class="tabla" id="tabla-clases">
+                            <thead>
+                                <tr>
+                                    <th>Clase #</th>
+                                    <th>Día 1</th>
+                                    <th>Día 2</th>
+                                    <th>Día 3</th>
+                                    <th>Día 4</th>
+                                    <th>Día 5</th>
+                                    <th>Día 6</th>
+                                    <th>Día 7</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>1era</th>
+                                    <td>Español</td>
+                                    <td>Sociales</td>
+                                    <td>Estadística</td>
+                                    <td>Filosofía</td>
+                                    <td>Dibujo/Skills</td>
+                                    <td>Matemáticas</td>
+                                    <td>Sociales</td>
+                                </tr>
+                                <tr>
+                                    <th>2da</th>
+                                    <td>Biología</td>
+                                    <td>Francés</td>
+                                    <td>Español</td>
+                                    <td>Francés</td>
+                                    <td>Dibujo/Skills</td>
+                                    <td>Ed Física</td>
+                                    <td>My English Lab</td>
+                                </tr>
+                                <tr>
+                                    <th>3era</th>
+                                    <td>Skills</td>
+                                    <td>Matemáticas</td>
+                                    <td>English</td>
+                                    <td>English</td>
+                                    <td>Sociales</td>
+                                    <td>Biología</td>
+                                    <td>English</td>
+                                </tr>
+                                <tr>
+                                    <th>4ta</th>
+                                    <td>Francés</td>
+                                    <td>Informática</td>
+                                    <td>PILEO</td>
+                                    <td>Matemáticas</td>
+                                    <td>Matemáticas</td>
+                                    <td>Física</td>
+                                    <td>Biología</td>
+                                </tr>
+                                <tr>
+                                    <th>5ta</th>
+                                    <td>English</td>
+                                    <td>Biología</td>
+                                    <td>Sociales</td>
+                                    <td>Informática</td>
+                                    <td>Danzas</td>
+                                    <td>PILEO</td>
+                                    <td>Matemáticas</td>
+                                </tr>
+                                <tr>
+                                    <th>6ta</th>
+                                    <td>Matemáticas</td>
+                                    <td>Ed Física</td>
+                                    <td>Informática</td>
+                                    <td>Ética y Valores</td>
+                                    <td>Español</td>
+                                    <td>Sociales</td>
+                                    <td>Química</td>
+                                </tr>
+                                <tr>
+                                    <th>7ma</th>
+                                    <td>Cátedra de Paz</td>
+                                    <td>Español</td>
+                                    <td>Danzas</td>
+                                    <td>Biología</td>
+                                    <td>English</td>
+                                    <td>Sociales</td>
+                                    <td>Español</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <section class="ficha-tecnica">
+            <div class="ficha-header">
+                <span class="ficha-numero">4</span>
+                <h3 class="ficha-titulo">Ficha Técnica del Piloto</h3>
+            </div>
+            <div class="ficha-grid">
+                <div class="ficha-item">
+                    <span class="ficha-label">Nombre</span>
+                    <span class="ficha-valor">Martin Benavides Silva</span>
+                </div>
+                <div class="ficha-item">
+                    <span class="ficha-label">Nacionalidad</span>
+                    <span class="ficha-valor">Colombiano</span>
+                </div>
+                <div class="ficha-item">
+                    <span class="ficha-label">Equipo</span>
+                    <span class="ficha-valor">MS Performance Garage</span>
+                </div>
+                <div class="ficha-item">
+                    <span class="ficha-label">Nº Piloto</span>
+                    <span class="ficha-valor">4</span>
+                </div>
+                <div class="ficha-item">
+                    <span class="ficha-label">Especialidad</span>
+                    <span class="ficha-valor">JDM / Hypercars / Drift</span>
+                </div>
+                <div class="ficha-item">
+                    <span class="ficha-label">Rol</span>
+                    <span class="ficha-valor">Estudiante y Diseñador</span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="registro" id="pagina-registro">
+        <div class="contenedor-titulo">
+            <h1 class="titulo">Acceso / Registro</h1>
+        </div>
+        <form id="form-registro-index">
+            <label for="nombre">NOMBRE DE USUARIO:</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Ingrese su piloto/usuario" required>
+
+            <label for="password">CONTRASEÑA:</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required>
+
+            <button type="submit" class="boton_1 btn-submit"><span>Registrarse</span></button>
+            <p id="mensaje-error" style="display:none; margin-top:15px; color:#ff3939; font-family:'Orbitron', sans-serif; font-size:0.85rem; letter-spacing:1px;">Acceso Denegado: Usuario o contraseña incorrectos.</p>
+        </form>
+        <button class="boton_1 btn-volver" id="btn-volver"><span>Volver al Garage</span></button>
+    </div>
+
+    <script>
+        const horario = document.getElementById('horario');
+        const btnToggle = document.getElementById('btn-toggle');
+        const botonColor = document.getElementById('btn-color');
+        const miTabla = document.getElementById('tabla-clases');
+
+        // Botón Ocultar / Mostrar horario
+        btnToggle.addEventListener('click', () => {
+            horario.style.display = (horario.style.display === 'none') ? 'block' : 'none';
+        });
+
+        // Modo Neon / Hacker
+        botonColor.addEventListener('click', () => {
+            miTabla.classList.toggle('modo-hacker');
+        });
+
+        // Navegación entre Inicio y Registro
+        const btnRegistro = document.getElementById('btn-registro');
+        const paginaInicio = document.getElementById('pagina-inicio');
+        const paginaRegistro = document.getElementById('pagina-registro');
+        const btnVolver = document.getElementById('btn-volver');
+
+        btnRegistro.addEventListener('click', () => {
+            paginaInicio.style.display = 'none';
+            paginaRegistro.style.display = 'block';
+        });
+
+        btnVolver.addEventListener('click', () => {
+            paginaRegistro.style.display = 'none';
+            paginaInicio.style.display = 'block';
+        });
+
+        // Validar credenciales y redirigir al menú si son correctas
+        const formRegistroIndex = document.getElementById('form-registro-index');
+        formRegistroIndex.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const usuarioInput = document.getElementById('nombre').value.trim();
+            const passwordInput = document.getElementById('password').value.trim();
+
+            const registrados = JSON.parse(localStorage.getItem('usuariosRegistrados')) || [];
+            const accesoValido = (usuarioInput === 'Martin_ms' && passwordInput === 'Mabesi2508') ||
+                                 registrados.some(u => u.usuario === usuarioInput && u.contrasena === passwordInput);
+
+            if (accesoValido) {
+                localStorage.setItem('usuarioPiloto', usuarioInput);
+                window.location.href = 'menu.html';
+            } else {
+                document.getElementById('mensaje-error').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
