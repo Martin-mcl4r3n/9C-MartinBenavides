@@ -231,7 +231,7 @@
     </div>
 
     <div class="hud-juego hud-curva">
-        TRAYECTO: <span id="curva-text">RECTA</span> | ADELANTAMIENTOS: <span id="overtake-text">0</span> | PUNTAJE: <span id="score-text">0</span> | TU MEJOR: <span id="best-text">0</span>
+        TRAYECTO: <span id="curva-text">RECTA</span> | ADELANTAMIENTOS: <span id="overtake-text">0</span> | PUNTAJE: <span id="score-text">0</span> | INTEGRIDAD: <span id="integrity-text">100%</span> | TU MEJOR: <span id="best-text">0</span>
     </div>
 
     <div class="canvas-container">
@@ -274,10 +274,12 @@
         let raceFinished = false;
         let puntajeGuardado = false;
         let spinMsg = 0;
+        let playerDNF = false;
+        let shake = 0;
         let animationFrameId;
         let playerDist = 0;
 
-        const roadHalf = 100;
+        const roadHalf = 115;
 
         // FÍSICA DEL MONOPLAZA (velocidad máxima 350 km/h)
         const player = {
@@ -294,7 +296,8 @@
             vx: 0,
             maxLat: 4.8,
             driftFriction: 0.88,
-            invulnerable: 0
+            invulnerable: 0,
+            integrity: 100
         };
 
         let particles = [];
@@ -322,8 +325,31 @@
         });
 
         // Trazado de la pista con curvas rápidas (amplias) y lentas (cerradas)
+        let trackComps = [];
+
+        function generarCircuito() {
+            const comps = [];
+            const n = 2 + Math.floor(Math.random() * 3);
+            for (let i = 0; i < n; i++) {
+                const amp = 15 + Math.random() * 25;
+                const wavelength = (350 + Math.random() * 850) * (1 + i * 0.5);
+                const phase = Math.random() * Math.PI * 2;
+                comps.push({ amp: amp, freq: 1 / wavelength, phase: phase });
+            }
+            const total = comps.reduce((s, c) => s + c.amp, 0);
+            if (total > 75) {
+                const k = 75 / total;
+                comps.forEach(c => c.amp *= k);
+            }
+            return comps;
+        }
+
         function roadCenterX(d) {
-            return canvas.width / 2 + 50 * Math.sin(d / 820) + 34 * Math.sin(d / 190);
+            let x = canvas.width / 2;
+            for (const c of trackComps) {
+                x += c.amp * Math.sin(d * c.freq + c.phase);
+            }
+            return x;
         }
 
         // ---------------- PUNTAJES ALTOS ----------------
@@ -355,7 +381,7 @@
         function guardarPuntaje() {
             if (puntajeGuardado) return;
             const pos = calcularPosicion();
-            const puntos = F1_POINTS[pos - 1] || 0;
+            const puntos = playerDNF ? 0 : (F1_POINTS[pos - 1] || 0);
             score = overtakes * 10 + puntos;
 
             const mejores = cargarMejores();
@@ -424,6 +450,9 @@
                     curSpeed: 0,
                     prevGap: null,
                     gap: null,
+                    dnf: false,
+                    crashTimer: 0,
+                    retired: false,
                     x: 0,
                     y: 0
                 });
@@ -431,10 +460,21 @@
         }
 
         function calcularPosicion() {
-            const orden = rivals.map(r => ({ dist: r.dist, jugador: false }))
+            const orden = rivals.filter(r => !r.dnf && !r.retired)
+                .map(r => ({ dist: r.dist, jugador: false }))
                 .concat([{ dist: playerDist, jugador: true }]);
             orden.sort((a, b) => b.dist - a.dist);
             return orden.findIndex(o => o.jugador) + 1;
+        }
+
+        function clasificacion() {
+            const orden = rivals.filter(r => !r.dnf && !r.retired)
+                .map(r => ({ codigo: r.nombre, color: r.color, dist: r.dist, jugador: false }));
+            if (!playerDNF) {
+                orden.push({ codigo: piloto.toUpperCase().slice(0, 8), color: '#00f0ff', dist: playerDist, jugador: true });
+            }
+            orden.sort((a, b) => b.dist - a.dist);
+            return orden;
         }
 
         function puntajeActual() {
@@ -444,6 +484,16 @@
         // Los rivales aceleran, frenan en las curvas y avanzan por la pista
         function moverRivales() {
             rivals.forEach(ai => {
+                if (ai.dnf) {
+                    if (ai.crashTimer > 0) {
+                        ai.crashTimer--;
+                        if (Math.random() < 0.45) createSmoke(ai.x, ai.y - 8);
+                        if (Math.random() < 0.2) createSparks(ai.x, ai.y);
+                        if (ai.crashTimer <= 0) ai.retired = true;
+                    }
+                    return;
+                }
+
                 const lat = Math.abs(roadCenterX(ai.dist) - roadCenterX(ai.dist - ai.topSpeed * 0.06));
                 let factor = 1;
                 if (lat > 3.2) factor = 0.55;
@@ -453,13 +503,49 @@
                 const objetivo = ai.topSpeed * factor;
                 ai.curSpeed += (objetivo - ai.curSpeed) * 0.02;
                 if (ai.curSpeed < 0) ai.curSpeed = 0;
-                ai.dist += ai.curSpeed * 0.06;
 
-                ai.prevGap = ai.gap;
+                // Riesgo de choque en curvas lentas a alta velocidad
+                if (lat > 2.4 && ai.curSpeed > 120 && Math.random() < 0.00013) {
+                    crashBot(ai);
+                    return;
+                }
+
+                ai.prevGap = ai.dist - playerDist;
+                ai.dist += ai.curSpeed * 0.06;
+            });
+
+            // Colisión entre bots: se tocan pero no se traspasan (los restos retirados no bloquean)
+            const orden = rivals.filter(r => !r.retired).slice().sort((a, b) => b.dist - a.dist);
+            const MIN_GAP = 44;
+            for (let i = 0; i < orden.length - 1; i++) {
+                const delante = orden[i];
+                const detras = orden[i + 1];
+                if (detras.dnf) continue;
+                if (delante.dist - detras.dist < MIN_GAP) {
+                    detras.dist = delante.dist - MIN_GAP;
+                    detras.curSpeed = Math.max(0, Math.min(detras.curSpeed, delante.curSpeed));
+                    if (Math.random() < (delante.dnf ? 0.06 : 0.03)) crashBot(detras);
+                }
+            }
+
+            rivals.forEach(ai => {
                 ai.gap = ai.dist - playerDist;
                 ai.y = player.y - ai.gap;
                 ai.x = roadCenterX(ai.dist) + ai.lane;
             });
+        }
+
+        function crashBot(ai) {
+            if (ai.dnf) return;
+            ai.dnf = true;
+            ai.crashTimer = 100;
+            ai.curSpeed = 0;
+            ai.gap = ai.dist - playerDist;
+            ai.y = player.y - ai.gap;
+            ai.x = roadCenterX(ai.dist) + ai.lane;
+            for (let i = 0; i < 8; i++) createSparks(ai.x, ai.y);
+            createDebris(ai.x, ai.y);
+            shake = Math.max(shake, 8);
         }
 
         // ---------------- PARTÍCULAS ----------------
@@ -485,6 +571,20 @@
                     vx: (Math.random() - 0.5) * 3,
                     vy: -Math.random() * 2,
                     color: '255, 120, 0'
+                });
+            }
+        }
+
+        function createDebris(x, y) {
+            for (let i = 0; i < 12; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    radius: Math.random() * 3 + 1.5,
+                    alpha: 0.9,
+                    vx: (Math.random() - 0.5) * 5,
+                    vy: (Math.random() - 0.5) * 4,
+                    color: Math.random() < 0.5 ? '255, 170, 0' : '255, 80, 40'
                 });
             }
         }
@@ -573,6 +673,11 @@
 
             if (player.invulnerable > 0) player.invulnerable--;
             if (spinMsg > 0) spinMsg--;
+            if (shake > 0) shake--;
+
+            const integText = document.getElementById('integrity-text');
+            integText.textContent = player.integrity + '%';
+            integText.style.color = player.integrity > 50 ? '#39ff14' : player.integrity > 25 ? '#ffb700' : '#ff0055';
 
             const scroll = player.speed * 0.06;
             const rc = roadCenterX(playerDist);
@@ -619,15 +724,21 @@
                 createSmoke(player.x, player.y + player.height / 2);
             }
 
+            // Humo del coche dañado
+            if (player.integrity < 50 && player.speed > 60 && Math.random() < 0.12) {
+                createSmoke(player.x - 6, player.y + player.height / 2);
+            }
+
             // 6. Avance del piloto por la pista
             playerDist += scroll;
 
             // 7. Movimiento de los rivales
             moverRivales();
 
-            // 8. Contactos (spin out, sin terminar la carrera)
+            // 8. Contactos (spin out, daño y posibles DNF)
+            let playerCrashed = false;
             rivals.forEach(ai => {
-                if (ai.y < -80 || ai.y > canvas.height + 80) return;
+                if (ai.retired || ai.y < -80 || ai.y > canvas.height + 80) return;
                 if (
                     player.invulnerable <= 0 &&
                     Math.abs(player.x - ai.x) < (player.width + ai.width) / 2 &&
@@ -638,12 +749,28 @@
                     player.angle = (Math.random() - 0.5) * 0.8;
                     player.invulnerable = 120;
                     spinMsg = 60;
+                    shake = 14;
+                    player.integrity = Math.max(0, player.integrity - 18 - Math.round(Math.random() * 14));
                     createSparks(player.x, player.y);
+                    createDebris(player.x, player.y);
+                    if (!ai.dnf && Math.random() < 0.25) crashBot(ai);
+
+                    if (player.integrity <= 0) {
+                        playerDNF = true;
+                        raceFinished = true;
+                        playerCrashed = true;
+                    }
                 }
             });
+            if (playerCrashed) {
+                guardarPuntaje();
+                draw();
+                return;
+            }
 
             // 9. Adelantamientos realizados
             rivals.forEach(ai => {
+                if (ai.dnf) return;
                 if (ai.prevGap !== null && ai.prevGap > 0 && ai.gap < -26) {
                     overtakes++;
                     document.getElementById('overtake-text').textContent = overtakes;
@@ -685,6 +812,12 @@
             // Fondo
             ctx.fillStyle = '#0a0a0f';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Temblor de cámara por choques
+            ctx.save();
+            if (shake > 0 && !raceFinished) {
+                ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+            }
 
             // Pista con curvas
             const step = 8;
@@ -764,10 +897,20 @@
                 ctx.restore();
             });
 
-            // Rivales (solo los visibles)
+            // Rivales (solo los visibles; los retirados desaparecen)
             rivals.forEach(ai => {
-                if (ai.y < -80 || ai.y > canvas.height + 80) return;
-                drawF1Car(ai.x, ai.y, 0, ai.color, '#ffffff');
+                if (ai.retired || ai.y < -80 || ai.y > canvas.height + 80) return;
+                const estrellado = ai.dnf && ai.crashTimer > 0;
+                drawF1Car(ai.x, ai.y, estrellado ? (Math.random() - 0.5) * 0.6 : 0, ai.color, estrellado ? '#ff0000' : '#ffffff', estrellado);
+                if (estrellado) {
+                    ctx.textAlign = 'center';
+                    ctx.font = 'bold 12px Orbitron';
+                    ctx.fillStyle = '#ff3939';
+                    ctx.shadowColor = '#ff3939';
+                    ctx.shadowBlur = 8;
+                    ctx.fillText('DNF', ai.x, ai.y - 34);
+                    ctx.shadowBlur = 0;
+                }
             });
 
             // Jugador (parpadea mientras es invulnerable tras un contacto)
@@ -782,47 +925,102 @@
                 ctx.fillText('¡CONTACTO! SPIN OUT', canvas.width / 2, canvas.height / 2 - 120);
             }
 
-            // Resultado de la carrera
+            // Fin del temblor de cámara (la pantalla final queda estable)
+            ctx.restore();
+
+            // Resultado de la carrera con podio
             if (raceFinished) {
                 const pos = calcularPosicion();
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                const fin = clasificacion();
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.94)';
+                ctx.fillRect(-30, -30, canvas.width + 60, canvas.height + 60);
 
                 ctx.textAlign = 'center';
                 ctx.font = 'bold 24px Orbitron';
-                ctx.fillStyle = '#39ff14';
-                ctx.fillText('FIN DE CARRERA', canvas.width / 2, canvas.height / 2 - 130);
+                if (playerDNF) {
+                    ctx.fillStyle = '#ff3939';
+                    ctx.shadowColor = '#ff3939';
+                    ctx.shadowBlur = 12;
+                    ctx.fillText('DNF - CARRO DESTRUIDO', canvas.width / 2, 60);
+                } else {
+                    ctx.fillStyle = '#39ff14';
+                    ctx.shadowColor = '#39ff14';
+                    ctx.shadowBlur = 12;
+                    ctx.fillText('FIN DE CARRERA', canvas.width / 2, 60);
+                }
+                ctx.shadowBlur = 0;
 
-                ctx.font = 'bold 20px Orbitron';
-                ctx.fillStyle = '#ffffff';
-                ctx.fillText(`POSICIÓN FINAL: P${pos}`, canvas.width / 2, canvas.height / 2 - 92);
+                // Piso del podio
+                const podiumBottom = 320;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+                ctx.fillRect(canvas.width / 2 - 175, podiumBottom, 350, 8);
 
-                ctx.font = '16px Rajdhani';
+                // Escalones del podio: P1 centro, P2 izquierda, P3 derecha
+                const podios = [
+                    { cx: canvas.width / 2,      h: 85, color: '#ffd700' },
+                    { cx: canvas.width / 2 - 92, h: 60, color: '#c0c0c0' },
+                    { cx: canvas.width / 2 + 92, h: 40, color: '#ffb700' }
+                ];
+                const podioW = 84;
+
+                for (let i = 0; i < 3; i++) {
+                    const p = podios[i];
+                    const r = fin[i] || { codigo: '---', color: '#333', jugador: false };
+                    const x = p.cx - podioW / 2;
+                    const y = podiumBottom - p.h;
+
+                    // Escalón neón
+                    ctx.fillStyle = p.color;
+                    ctx.shadowColor = p.color;
+                    ctx.shadowBlur = 14;
+                    ctx.fillRect(x, y, podioW, p.h);
+                    ctx.shadowBlur = 0;
+
+                    // Cara frontal más oscura
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+                    ctx.fillRect(x, y + p.h - 12, podioW, 12);
+
+                    // Placa del piloto sobre el escalón
+                    ctx.font = 'bold 15px Orbitron';
+                    ctx.fillStyle = '#0a0a0f';
+                    ctx.fillText(`${i + 1}º ${r.codigo}`, p.cx, y - 10);
+
+                    // Marca del jugador
+                    if (r.jugador) {
+                        ctx.font = 'bold 10px Orbitron';
+                        ctx.fillStyle = '#00f0ff';
+                        ctx.fillText('★ TÚ', p.cx, y - 26);
+                    }
+                }
+
+                // Resumen del piloto
+                ctx.font = 'bold 16px Orbitron';
+                ctx.fillStyle = playerDNF ? '#ff3939' : '#ffffff';
+                ctx.fillText(`TU POSICIÓN: ${playerDNF ? 'DNF' : 'P' + pos}`, canvas.width / 2, podiumBottom + 34);
+
+                ctx.font = '14px Rajdhani';
                 ctx.fillStyle = '#00f0ff';
-                ctx.fillText(`ADELANTAMIENTOS: ${overtakes}`, canvas.width / 2, canvas.height / 2 - 60);
+                ctx.fillText(`ADELANTAMIENTOS: ${overtakes}   PUNTAJE: ${score}`, canvas.width / 2, podiumBottom + 56);
 
-                ctx.font = 'bold 18px Orbitron';
+                ctx.font = '13px Orbitron';
                 ctx.fillStyle = '#39ff14';
-                ctx.fillText(`PUNTAJE: ${score}`, canvas.width / 2, canvas.height / 2 - 28);
+                ctx.fillText(`TU MEJOR: ${mejorPuntaje()}`, canvas.width / 2, podiumBottom + 78);
 
-                ctx.font = '14px Orbitron';
-                ctx.fillStyle = '#00f0ff';
-                ctx.fillText(`TU MEJOR: ${mejorPuntaje()}`, canvas.width / 2, canvas.height / 2 + 2);
-
+                // Top 5 históricos
                 const mejores = cargarMejores();
-                ctx.font = '14px Orbitron';
+                ctx.font = '12px Orbitron';
                 ctx.fillStyle = '#ff0055';
-                ctx.fillText('TOP 5', canvas.width / 2, canvas.height / 2 + 36);
+                ctx.fillText('TOP 5', canvas.width / 2, podiumBottom + 108);
 
                 if (mejores.length === 0) {
-                    ctx.font = '14px Rajdhani';
+                    ctx.font = '13px Rajdhani';
                     ctx.fillStyle = '#d1d5db';
-                    ctx.fillText('Aún no hay registros', canvas.width / 2, canvas.height / 2 + 58);
+                    ctx.fillText('Aún no hay registros', canvas.width / 2, podiumBottom + 128);
                 } else {
-                    ctx.font = '14px Rajdhani';
+                    ctx.font = '13px Rajdhani';
                     ctx.fillStyle = '#d1d5db';
                     mejores.slice(0, 5).forEach((m, i) => {
-                        ctx.fillText(`${i + 1}. ${m.nombre}  ${m.puntaje}`, canvas.width / 2, canvas.height / 2 + 58 + i * 18);
+                        ctx.fillText(`${i + 1}. ${m.nombre}  ${m.puntaje}`, canvas.width / 2, podiumBottom + 128 + i * 16);
                     });
                 }
             }
@@ -837,6 +1035,8 @@
             raceFinished = false;
             puntajeGuardado = false;
             spinMsg = 0;
+            playerDNF = false;
+            shake = 0;
             playerDist = 0;
             player.x = canvas.width / 2;
             player.y = canvas.height - 90;
@@ -844,6 +1044,7 @@
             player.angle = 0;
             player.speed = 0;
             player.invulnerable = 0;
+            player.integrity = 100;
             inicializarRivales();
 
             document.getElementById('score-text').textContent = 0;
@@ -852,6 +1053,8 @@
             document.getElementById('curva-text').textContent = 'RECTA';
             document.getElementById('lap-text').textContent = 1;
             document.getElementById('pos-text').textContent = 'P' + calcularPosicion();
+            document.getElementById('integrity-text').textContent = '100%';
+            document.getElementById('integrity-text').style.color = '#39ff14';
 
             draw();
             update();
@@ -859,7 +1062,8 @@
 
         document.getElementById('btn-reiniciar').addEventListener('click', restartGame);
 
-        // Inicializar parrilla, tabla de mejores y arrancar la carrera
+        // Inicializar circuito nuevo, parrilla, tabla de mejores y arrancar la carrera
+        trackComps = generarCircuito();
         inicializarRivales();
         renderMejores();
         draw();
