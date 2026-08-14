@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist Pits | Tokyo Drift Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* CONFIGURACIÓN DE COLORES Y ESTILOS GLOBALES DEL SITIO */
+        :root {
+            --bg-color: #0a0a0f;
+            --text-color: #ffffff;
+            --accent-pink: #ff0055;
+            --accent-green: #39ff14;
+            --accent-cyan: #00f0ff;
+            --card-bg: rgba(18, 18, 26, 0.95);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(255, 0, 85, 0.15), transparent 40%),
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px 10px;
+        }
+
+        /* HEADER Y TITULOS */
+        .contenedor-titulo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .titulo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-style: italic;
+            letter-spacing: 3px;
+            color: var(--text-color);
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px var(--accent-pink),
+                0 0 20px var(--accent-pink);
+        }
+
+        .contenedor-tareas {
+            max-width: 750px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.3);
+            padding: 25px;
+        }
+
+        /* FORMULARIO AGREGAR TAREA */
+        .form-tarea {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .input-tarea {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--accent-cyan);
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            outline: none;
+        }
+
+        .input-tarea:focus {
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        /* BOTONES GLOBALES DEL SITIO */
+        .boton_1 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            padding: 12px 20px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--accent-green);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            transform: skewX(-12deg);
+            text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .boton_1 span {
+            display: inline-block;
+            transform: skewX(12deg);
+        }
+
+        .boton_1:hover {
+            background: var(--accent-green);
+            color: #000;
+            box-shadow: 0 0 20px var(--accent-green);
+            transform: skewX(-12deg) scale(1.05);
+        }
+
+        .btn-menu {
+            display: block;
+            margin: 25px auto 0;
+            text-align: center;
+            border-color: var(--accent-pink);
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
+            max-width: 200px;
+        }
+
+        .btn-menu:hover {
+            background: var(--accent-pink);
+            color: #fff;
+            box-shadow: 0 0 20px var(--accent-pink);
+        }
+
+        /* LISTA DE TAREAS */
+        .lista-tareas {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .item-tarea {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--accent-green);
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .item-tarea.completada {
+            border-color: #555;
+            background: rgba(20, 20, 20, 0.4);
+            opacity: 0.6;
+        }
+
+        .texto-tarea {
+            font-size: 1.15rem;
+            cursor: pointer;
+            flex: 1;
+            margin-right: 15px;
+        }
+
+        .item-tarea.completada .texto-tarea {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        .acciones-tarea {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-accion {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border: 1px solid;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-check {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .btn-check:hover {
+            background: var(--accent-green);
+            color: #000;
+        }
+
+        .btn-del {
+            border-color: #ff3939;
+            color: #ff3939;
+        }
+
+        .btn-del:hover {
+            background: #ff3939;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .titulo {
+                font-size: 1.8rem;
+            }
+            .form-tarea {
+                flex-direction: column;
+            }
+            .boton_1 {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="contenedor-tareas">
+        <header class="contenedor-titulo">
+            <h1 class="titulo">Checklist Pits</h1>
+        </header>
+
+        <form class="form-tarea" id="form-tarea">
+            <input type="text" class="input-tarea" id="input-tarea" placeholder="Agregar ajuste de motor, tarea escolar..." required>
+            <button type="submit" class="boton_1"><span>+ Agregar</span></button>
+        </form>
+
+        <ul class="lista-tareas" id="lista-tareas">
+            </ul>
+
+        <a href="menu.html" class="boton_1 btn-menu"><span>Volver al Menú</span></a>
+    </main>
+
+    <script>
+        const formTarea = document.getElementById('form-tarea');
+        const inputTarea = document.getElementById('input-tarea');
+        const listaTareas = document.getElementById('lista-tareas');
+
+        // Acceso restringido: si no hay sesión activa, redirigir al login
+        if (!localStorage.getItem('usuarioPiloto')) {
+            window.location.replace('Registro.html');
+        }
+
+        // Cargar tareas guardadas desde localStorage
+        function cargarTareas() {
+            listaTareas.innerHTML = '';
+            const tareas = JSON.parse(localStorage.getItem('checklistPits')) || [];
+
+            if (tareas.length === 0) {
+                listaTareas.innerHTML = '<p style="color: #888; text-align: center;">No hay tareas pendientes en Pits.</p>';
+                return;
+            }
+
+            tareas.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = `item-tarea ${item.completada ? 'completada' : ''}`;
+
+                const spanTexto = document.createElement('span');
+                spanTexto.className = 'texto-tarea';
+                spanTexto.textContent = item.texto;
+                spanTexto.addEventListener('click', () => completarTarea(index));
+
+                const divAcciones = document.createElement('div');
+                divAcciones.className = 'acciones-tarea';
+
+                const btnCheck = document.createElement('button');
+                btnCheck.className = 'btn-accion btn-check';
+                btnCheck.textContent = item.completada ? 'Desmarcar' : 'Hecho';
+                btnCheck.addEventListener('click', () => completarTarea(index));
+
+                const btnDel = document.createElement('button');
+                btnDel.className = 'btn-accion btn-del';
+                btnDel.textContent = 'Eliminar';
+                btnDel.addEventListener('click', () => borrarTarea(index));
+
+                divAcciones.appendChild(btnCheck);
+                divAcciones.appendChild(btnDel);
+                li.appendChild(spanTexto);
+                li.appendChild(divAcciones);
+                listaTareas.appendChild(li);
+            });
+        }
+
+        // Agregar nueva tarea
+        formTarea.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const texto = inputTarea.value.trim();
+            if (!texto) return;
+
+            const tareas = JSON.parse(localStorage.getItem('checklistPits')) || [];
+            tareas.unshift({ texto, completada: false });
+
+            localStorage.setItem('checklistPits', JSON.stringify(tareas));
+            inputTarea.value = '';
+            cargarTareas();
+        });
+
+        // Alternar estado completado/pendiente
+        function completarTarea(index) {
+            const tareas = JSON.parse(localStorage.getItem('checklistPits')) || [];
+            tareas[index].completada = !tareas[index].completada;
+            localStorage.setItem('checklistPits', JSON.stringify(tareas));
+            cargarTareas();
+        }
+
+        // Eliminar tarea
+        function borrarTarea(index) {
+            const tareas = JSON.parse(localStorage.getItem('checklistPits')) || [];
+            tareas.splice(index, 1);
+            localStorage.setItem('checklistPits', JSON.stringify(tareas));
+            cargarTareas();
+        }
+
+        // Inicializar
+        cargarTareas();
+    </script>
+</body>
+</html>

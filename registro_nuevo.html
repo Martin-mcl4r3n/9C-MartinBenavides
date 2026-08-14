@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Cuenta | Tokyo Drift Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0a0a0f;
+            --text-color: #ffffff;
+            --accent-pink: #ff0055;
+            --accent-green: #39ff14;
+            --accent-cyan: #00f0ff;
+            --card-bg: rgba(18, 18, 26, 0.95);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(255, 0, 85, 0.15), transparent 40%),
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 10px;
+        }
+
+        .contenedor-titulo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .titulo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-style: italic;
+            letter-spacing: 3px;
+            color: var(--text-color);
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px var(--accent-pink),
+                0 0 20px var(--accent-pink),
+                0 0 40px var(--accent-pink);
+        }
+
+        .registro-box {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border: 2px solid var(--accent-green);
+            box-shadow: 0 0 25px rgba(57, 255, 20, 0.3);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .registro-box label {
+            display: block;
+            margin-top: 15px;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-green);
+            text-align: left;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .registro-box input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border: 1px solid var(--accent-green);
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            outline: none;
+        }
+
+        .registro-box input:focus {
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+
+        .boton_1 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            padding: 12px 24px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--accent-green);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            transform: skewX(-12deg);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .boton_1 span {
+            display: inline-block;
+            transform: skewX(12deg);
+        }
+
+        .boton_1:hover {
+            background: var(--accent-green);
+            color: #000;
+            box-shadow: 0 0 20px var(--accent-green);
+            transform: skewX(-12deg) scale(1.05);
+        }
+
+        .btn-enviar {
+            margin-top: 25px;
+            width: 100%;
+        }
+
+        .btn-volver {
+            margin-top: 15px;
+            padding: 10px 20px;
+            color: #fff;
+            background: transparent;
+            border: 2px solid var(--accent-pink);
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.5);
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            transform: skewX(-12deg);
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .btn-volver:hover {
+            background: var(--accent-pink);
+            color: #fff;
+            box-shadow: 0 0 20px var(--accent-pink);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="registro-box">
+        <header class="contenedor-titulo">
+            <h1 class="titulo">Crear Cuenta de Piloto</h1>
+        </header>
+
+        <form id="form-registro-nuevo">
+            <label for="nuevo-nombre">PILOTO / USUARIO:</label>
+            <input type="text" id="nuevo-nombre" name="nuevo-nombre" placeholder="Elige tu nombre de piloto" required>
+
+            <label for="nuevo-password">CONTRASEÑA:</label>
+            <input type="password" id="nuevo-password" name="nuevo-password" placeholder="Crea tu contraseña" required>
+
+            <label for="confirmar-password">CONFIRMAR CONTRASEÑA:</label>
+            <input type="password" id="confirmar-password" name="confirmar-password" placeholder="Repite la contraseña" required>
+
+            <button type="submit" class="boton_1 btn-enviar"><span>Registrar Piloto</span></button>
+            <p id="mensaje-error" style="display:none; margin-top:15px; color:#ff3939; font-family:'Orbitron', sans-serif; font-size:0.85rem; letter-spacing:1px;"></p>
+        </form>
+
+        <a href="index.html" class="btn-volver"><span>Volver a Inicio</span></a>
+    </div>
+
+    <script>
+        const formNuevo = document.getElementById('form-registro-nuevo');
+        const mensajeError = document.getElementById('mensaje-error');
+
+        function mostrarError(texto) {
+            mensajeError.textContent = texto;
+            mensajeError.style.display = 'block';
+        }
+
+        formNuevo.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const usuario = document.getElementById('nuevo-nombre').value.trim();
+            const password = document.getElementById('nuevo-password').value.trim();
+            const confirmar = document.getElementById('confirmar-password').value.trim();
+
+            if (usuario.length < 3) {
+                mostrarError('El usuario debe tener al menos 3 caracteres.');
+                return;
+            }
+            if (password.length < 4) {
+                mostrarError('La contraseña debe tener al menos 4 caracteres.');
+                return;
+            }
+            if (password !== confirmar) {
+                mostrarError('Las contraseñas no coinciden.');
+                return;
+            }
+
+            const registrados = JSON.parse(localStorage.getItem('usuariosRegistrados')) || [];
+            if (registrados.some(u => u.usuario === usuario)) {
+                mostrarError('Ese usuario ya está registrado. Elige otro.');
+                return;
+            }
+
+            registrados.push({ usuario: usuario, contrasena: password });
+            localStorage.setItem('usuariosRegistrados', JSON.stringify(registrados));
+            localStorage.setItem('usuarioPiloto', usuario);
+
+            // Registro exitoso: lleva directo al menú
+            window.location.href = 'menu.html';
+        });
+    </script>
+</body>
+</html>

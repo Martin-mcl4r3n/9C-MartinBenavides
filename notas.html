@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora MS | Tokyo Drift Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* CONFIGURACIÓN DE COLORES Y ESTILOS GLOBALES DEL SITIO */
+        :root {
+            --bg-color: #0a0a0f;
+            --text-color: #ffffff;
+            --accent-pink: #ff0055;
+            --accent-green: #39ff14;
+            --accent-cyan: #00f0ff;
+            --card-bg: rgba(18, 18, 26, 0.95);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(255, 0, 85, 0.15), transparent 40%),
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px 10px;
+        }
+
+        /* HEADER Y TITULOS */
+        .contenedor-titulo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .titulo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-style: italic;
+            letter-spacing: 3px;
+            color: var(--text-color);
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px var(--accent-pink),
+                0 0 20px var(--accent-pink);
+        }
+
+        .contenedor-calculadora {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 2px solid var(--accent-green);
+            box-shadow: 0 0 25px rgba(57, 255, 20, 0.3);
+            padding: 25px;
+        }
+
+        /* TARJETA DE PROMEDIO GENERAL */
+        .card-promedio {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .card-promedio h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--accent-cyan);
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .valor-promedio {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--accent-green);
+            text-shadow: 0 0 15px var(--accent-green);
+        }
+
+        /* FORMULARIO NOTAS */
+        .form-notas {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 10px;
+            margin-bottom: 25px;
+            align-items: end;
+        }
+
+        .group-input {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .group-input label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: var(--accent-green);
+        }
+
+        .group-input input {
+            padding: 10px;
+            border: 1px solid var(--accent-green);
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .group-input input:focus {
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+
+        /* BOTONES GLOBALES */
+        .boton_1 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            padding: 11px 18px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--accent-green);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            transform: skewX(-12deg);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .boton_1 span {
+            display: inline-block;
+            transform: skewX(12deg);
+        }
+
+        .boton_1:hover {
+            background: var(--accent-green);
+            color: #000;
+            box-shadow: 0 0 20px var(--accent-green);
+            transform: skewX(-12deg) scale(1.05);
+        }
+
+        .btn-menu {
+            display: block;
+            margin: 25px auto 0;
+            text-align: center;
+            border-color: var(--accent-pink);
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
+            max-width: 200px;
+        }
+
+        .btn-menu:hover {
+            background: var(--accent-pink);
+            color: #fff;
+            box-shadow: 0 0 20px var(--accent-pink);
+        }
+
+        /* TABLA DE NOTAS */
+        .tabla-notas {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .tabla-notas th, .tabla-notas td {
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            padding: 10px;
+            text-align: center;
+        }
+
+        .tabla-notas th {
+            font-family: 'Orbitron', sans-serif;
+            background: rgba(57, 255, 20, 0.15);
+            color: var(--accent-green);
+            font-size: 0.85rem;
+        }
+
+        .btn-del {
+            background: transparent;
+            border: 1px solid #ff3939;
+            color: #ff3939;
+            padding: 4px 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .btn-del:hover {
+            background: #ff3939;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .titulo {
+                font-size: 1.8rem;
+            }
+            .form-notas {
+                grid-template-columns: 1fr;
+            }
+            .boton_1 {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="contenedor-calculadora">
+        <header class="contenedor-titulo">
+            <h1 class="titulo">Calculadora MS</h1>
+        </header>
+
+        <div class="card-promedio">
+            <h2>PROMEDIO GENERAL DE PERFORMANCE</h2>
+            <div class="valor-promedio" id="promedio-total">0.0</div>
+        </div>
+
+        <form class="form-notas" id="form-notas">
+            <div class="group-input">
+                <label for="materia">MATERIA / EVALUACIÓN:</label>
+                <input type="text" id="materia" placeholder="Ej: Matemáticas" required>
+            </div>
+            <div class="group-input">
+                <label for="nota">NOTA (0 - 5.0):</label>
+                <input type="number" id="nota" step="0.1" min="0" max="5" placeholder="4.5" required>
+            </div>
+            <div class="group-input">
+                <label for="porcentaje">PESO (%):</label>
+                <input type="number" id="porcentaje" min="1" max="100" placeholder="25" required>
+            </div>
+            <button type="submit" class="boton_1"><span>+ Agregar</span></button>
+        </form>
+
+        <div style="overflow-x: auto;">
+            <table class="tabla-notas">
+                <thead>
+                    <tr>
+                        <th>Materia</th>
+                        <th>Nota</th>
+                        <th>Porcentaje</th>
+                        <th>Puntos</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-tabla">
+                    </tbody>
+            </table>
+        </div>
+
+        <a href="menu.html" class="boton_1 btn-menu"><span>Volver al Menú</span></a>
+    </main>
+
+    <script>
+        const formNotas = document.getElementById('form-notas');
+        const cuerpoTabla = document.getElementById('cuerpo-tabla');
+        const promedioTotal = document.getElementById('promedio-total');
+
+        // Acceso restringido: si no hay sesión activa, redirigir al login
+        if (!localStorage.getItem('usuarioPiloto')) {
+            window.location.replace('Registro.html');
+        }
+
+        // Cargar notas desde localStorage y recalcular
+        function cargarNotas() {
+            cuerpoTabla.innerHTML = '';
+            const listaNotas = JSON.parse(localStorage.getItem('notasAcademicas')) || [];
+            
+            let sumaPuntos = 0;
+            let sumaPorcentajes = 0;
+
+            if (listaNotas.length === 0) {
+                cuerpoTabla.innerHTML = '<tr><td colspan="5" style="color: #888;">No hay notas registradas.</td></tr>';
+                promedioTotal.textContent = '0.0';
+                return;
+            }
+
+            listaNotas.forEach((item, index) => {
+                const puntos = (item.nota * (item.porcentaje / 100));
+                sumaPuntos += puntos;
+                sumaPorcentajes += Number(item.porcentaje);
+
+                const tr = document.createElement('tr');
+
+                const tdMateria = document.createElement('td');
+                tdMateria.textContent = item.materia;
+
+                const tdNota = document.createElement('td');
+                tdNota.style.color = 'var(--accent-cyan)';
+                tdNota.style.fontWeight = 'bold';
+                tdNota.textContent = item.nota.toFixed(1);
+
+                const tdPorcentaje = document.createElement('td');
+                tdPorcentaje.textContent = item.porcentaje + '%';
+
+                const tdPuntos = document.createElement('td');
+                tdPuntos.textContent = puntos.toFixed(2);
+
+                const tdAccion = document.createElement('td');
+                const btnDel = document.createElement('button');
+                btnDel.className = 'btn-del';
+                btnDel.textContent = 'X';
+                btnDel.addEventListener('click', () => borrarNota(index));
+                tdAccion.appendChild(btnDel);
+
+                tr.appendChild(tdMateria);
+                tr.appendChild(tdNota);
+                tr.appendChild(tdPorcentaje);
+                tr.appendChild(tdPuntos);
+                tr.appendChild(tdAccion);
+                cuerpoTabla.appendChild(tr);
+            });
+
+            // Ajuste del promedio
+            const promedioFinal = sumaPorcentajes > 0 ? (sumaPuntos / (sumaPorcentajes / 100)) : 0;
+            promedioTotal.textContent = promedioFinal.toFixed(2);
+        }
+
+        // Agregar nueva nota
+        formNotas.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const materia = document.getElementById('materia').value.trim();
+            const nota = parseFloat(document.getElementById('nota').value);
+            const porcentaje = parseFloat(document.getElementById('porcentaje').value);
+
+            const listaNotas = JSON.parse(localStorage.getItem('notasAcademicas')) || [];
+            listaNotas.unshift({ materia, nota, porcentaje });
+
+            localStorage.setItem('notasAcademicas', JSON.stringify(listaNotas));
+            formNotas.reset();
+            cargarNotas();
+        });
+
+        // Borrar nota
+        function borrarNota(index) {
+            const listaNotas = JSON.parse(localStorage.getItem('notasAcademicas')) || [];
+            listaNotas.splice(index, 1);
+            localStorage.setItem('notasAcademicas', JSON.stringify(listaNotas));
+            cargarNotas();
+        }
+
+        // Inicializar
+        cargarNotas();
+    </script>
+</body>
+</html>
