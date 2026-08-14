@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paddock Dashboard | Tokyo Drift Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* CONFIGURACIÓN DE COLORES Y ESTILOS GLOBALES DEL SITIO */
+        :root {
+            --bg-color: #0a0a0f;
+            --text-color: #ffffff;
+            --accent-pink: #ff0055;
+            --accent-green: #39ff14;
+            --accent-cyan: #00f0ff;
+            --card-bg: rgba(18, 18, 26, 0.95);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(255, 0, 85, 0.15), transparent 40%),
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px 10px;
+        }
+
+        /* HEADER Y TITULOS */
+        .contenedor-titulo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .titulo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-style: italic;
+            letter-spacing: 3px;
+            color: var(--text-color);
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px var(--accent-pink),
+                0 0 20px var(--accent-pink),
+                0 0 40px var(--accent-pink);
+        }
+
+        .saludo-usuario {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        /* CONTENEDOR MENU */
+        .menu-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 2px solid var(--accent-pink);
+            box-shadow: 0 0 25px rgba(255, 0, 85, 0.3);
+            padding: 30px;
+        }
+
+        .subtitulo {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-green);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 1.5px;
+        }
+
+        /* REJILLA DE ACCESOS DIRECTOS */
+        .grid-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card-seccion {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-seccion:hover {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .card-seccion h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-pink);
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .card-seccion p {
+            color: #d1d5db;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        /* BOTONES GLOBALES DEL SITIO */
+        .boton_1 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            padding: 10px 18px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--accent-green);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            transform: skewX(-12deg);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .boton_1 span {
+            display: inline-block;
+            transform: skewX(12deg);
+        }
+
+        .boton_1:hover {
+            background: var(--accent-green);
+            color: #000;
+            box-shadow: 0 0 20px var(--accent-green);
+            transform: skewX(-12deg) scale(1.05);
+        }
+
+        .btn-cerrar {
+            display: block;
+            margin: 30px auto 0;
+            text-align: center;
+            border-color: var(--accent-pink);
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
+        }
+
+        .btn-cerrar:hover {
+            background: var(--accent-pink);
+            color: #fff;
+            box-shadow: 0 0 20px var(--accent-pink);
+        }
+
+        @media (max-width: 768px) {
+            .titulo {
+                font-size: 1.8rem;
+            }
+            .saludo-usuario {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="menu-container">
+        <header class="contenedor-titulo">
+            <h1 class="titulo">MS Performance</h1>
+            <div class="saludo-usuario" id="mensaje-saludo">¡Hola, Piloto!</div>
+        </header>
+
+        <p class="subtitulo">SELECCIONA TU DESTINO EN EL PADDOCK</p>
+
+        <div class="grid-menu">
+            <div class="card-seccion">
+                <h3>Night Drift Canvas</h3>
+                <p>Compite en la pista nocturna evadiendo obstáculos a alta velocidad.</p>
+                <a href="juego.html" class="boton_1"><span>Entrar a Pista</span></a>
+            </div>
+
+            <div class="card-seccion">
+                <h3>Diario de Bordo</h3>
+                <p>Escribe y administra tus registros, ideas de tuning y bitácoras.</p>
+                <a href="diario.html" class="boton_1"><span>Ver Diario</span></a>
+            </div>
+
+            <div class="card-seccion">
+                <h3>Checklist Pits</h3>
+                <p>Organiza tus tareas pendientes, optimizaciones y deberes escolares.</p>
+                <a href="tareas.html" class="boton_1"><span>Ver Checklists</span></a>
+            </div>
+
+            <div class="card-seccion">
+                <h3>Calculadora MS</h3>
+                <p>Calcula tu rendimiento académico e historial de calificaciones.</p>
+                <a href="notas.html" class="boton_1"><span>Calcular Notas</span></a>
+            </div>
+        </div>
+
+        <a href="index.html" class="boton_1 btn-cerrar" id="btn-logout"><span>Cerrar Sesión</span></a>
+    </main>
+
+    <script>
+        // Acceso restringido: si no hay sesión activa, redirigir al login
+        if (!localStorage.getItem('usuarioPiloto')) {
+            window.location.replace('Registro.html');
+        }
+
+        // Cargar y mostrar el nombre guardado en localStorage
+        const nombreGuardado = localStorage.getItem('usuarioPiloto') || 'Piloto Anónimo';
+        document.getElementById('mensaje-saludo').textContent = `¡Hola, ${nombreGuardado}!`;
+
+        // Cerrar sesión
+        document.getElementById('btn-logout').addEventListener('click', () => {
+            localStorage.removeItem('usuarioPiloto');
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>
